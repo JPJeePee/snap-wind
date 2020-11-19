@@ -18,7 +18,7 @@
       <div class=hint>请输入精度：</div>
       <el-input class="input" v-model="delta" placeholder="请输入delta"></el-input>
     </div>
-    <el-button class="btn" type="primary" @click="this.handleClick">start</el-button>
+    <el-button class="btn" type="primary" @click="this.handleClick" :loading="loading">start</el-button>
   </div>
 </template>
 
@@ -29,6 +29,7 @@
     name: 'landing-page',
     data () {
       return {
+        loading: false,
         url: '',
         minX: '',
         minY: '',
@@ -39,16 +40,27 @@
     },
     methods: {
       handleClick () {
-        // ipcRenderer.send('startPa', {
-        //   url: this.url
-        // })
-        ipcRenderer.send('test1', {a: '111'
-        })
-
+        if (this.loading) {
+          return;
+        }
+        this.loading  = true
         if (this.url && this.minX && this.minY && this.maxX && this.maxY && this.delta) {
-
+          this.$message({
+            message: '已启动',
+            type: 'success'
+          });
+          ipcRenderer.send('start', {
+            url: this.url,
+            minX: this.minX,
+            minY: this.minY,
+            maxX: this.maxX,
+            maxY: this.maxY,
+            delta: this.delta
+          })
+          this.loading = false
         } else {
           this.$message.error('请输入完整信息')
+          this.loading = false
         }
       }
     }
