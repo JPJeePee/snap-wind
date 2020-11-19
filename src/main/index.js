@@ -1,6 +1,13 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog } from 'electron'
+// const superagent = require('superagent')
+// var fs = require("fs");
+// const xlsx = require('node-xlsx');
+import xlsx from 'node-xlsx';
+import handler from './handler'
+import fs from 'fs'
+// const handler = require('./handler');
 // const ipcMain = require('electron').ipcMain
 // ipcMain.on('test1', function () {
 //   console.log('----54545645---')
@@ -49,8 +56,35 @@ function createWindow() {
     mainWindow = null
   })
 
-  ipcMain.on('test1', function () {
-    console.log('----4444---')
+  const openDialog = (defaultpath = '/') => new Promise((resolve, reject) => {
+    dialog.showOpenDialog({
+      defaultPath: this.savePath,
+      properties: [
+        'openDirectory',
+      ],
+    }, (res = []) => {
+      // callback(res[0]);
+      resolve(res[0]);
+    });
+  })
+
+  ipcMain.on('open-folder', async (event) => {
+    const path = await openDialog();
+    event.returnValue = path;
+  });
+
+  ipcMain.on('start', function (e, data) {
+    console.log('----4444---', data)
+    // const { minX, minY, maxX, maxY, delta } = data;
+    handler(data).then((d) => {
+      console.log(d)
+      const buffer = xlsx.build([{ name: "mySheetName", data: d }])
+      const split = data.url.split('/');
+      fs.writeFile(data.path + `/${split[split.length - 1]}_${Date.now()}.xlsx`, buffer, (res) => {
+        console.log('writeFile success')
+        mainWindow.webContents.send('success');
+      })
+    })
   });
 }
 
