@@ -1,10 +1,10 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
-const ipcMain = require('electron').ipcMain;
-ipcMain.on('test1', function() {
-  console.log('----54545645---')
-});
+import { app, BrowserWindow, ipcMain } from 'electron'
+// const ipcMain = require('electron').ipcMain
+// ipcMain.on('test1', function () {
+//   console.log('----54545645---')
+// })
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -18,7 +18,7 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
 
-function createWindow () {
+function createWindow() {
   /**
    * Initial window options
    */
@@ -28,28 +28,30 @@ function createWindow () {
     width: 1000
   })
 
-  console.log('1111-------')
-  ipcMain.once('startPa', (data) => {
-    console.log('-------')
-  })
+  // console.log('1111-------')
+  // ipcMain.once('startPa', (data) => {
+  //   console.log('-------')
+  // })
 
-  mainWindow.webContents.send('test', 'fdsfdsfdsfs')
+  // mainWindow.webContents.send('test', 'fdsfdsfdsfs')
   mainWindow.loadURL(winURL)
 
-  if (process.env.NODE_ENV === "development") {
-      mainWindow.webContents.on("did-frame-finish-load", () => {
-        mainWindow.webContents.once("devtools-opened", () => {
-          mainWindow.focus();
-        });
-        mainWindow.webContents.openDevTools();
-      });
-    }
+  // if (process.env.NODE_ENV === 'development') {
+  //   mainWindow.webContents.on('did-frame-finish-load', () => {
+  //     mainWindow.webContents.once('devtools-opened', () => {
+  //       mainWindow.focus()
+  //     })
+  //     mainWindow.webContents.openDevTools()
+  //   })
+  // }
 
   mainWindow.on('closed', () => {
     mainWindow = null
   })
-  
-  
+
+  ipcMain.on('test1', function () {
+    console.log('----4444---')
+  });
 }
 
 app.on('ready', createWindow)

@@ -15,11 +15,17 @@ require('electron-debug')()
 require('electron').app.on('ready', () => {
   let installExtension = require('electron-devtools-installer')
   installExtension.default(installExtension.VUEJS_DEVTOOLS)
-    .then(() => {})
+    .then(() => { })
     .catch(err => {
       console.log('Unable to install `vue-devtools`: \n', err)
     })
 })
+
+// const ipcMain = require('electron').ipcMain;
+// console.log('sgtart -------------------')
+// ipcMain.on('test1', function () {
+//   console.log('----54545645---')
+// });
 
 // Require `main` process to boot app
 require('./index')
