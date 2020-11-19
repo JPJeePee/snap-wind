@@ -1,17 +1,9 @@
 'use strict'
 
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
-// const superagent = require('superagent')
-// var fs = require("fs");
-// const xlsx = require('node-xlsx');
+import fs from 'fs'
 import xlsx from 'node-xlsx';
 import handler from './handler'
-import fs from 'fs'
-// const handler = require('./handler');
-// const ipcMain = require('electron').ipcMain
-// ipcMain.on('test1', function () {
-//   console.log('----54545645---')
-// })
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -35,22 +27,7 @@ function createWindow() {
     width: 1000
   })
 
-  // console.log('1111-------')
-  // ipcMain.once('startPa', (data) => {
-  //   console.log('-------')
-  // })
-
-  // mainWindow.webContents.send('test', 'fdsfdsfdsfs')
   mainWindow.loadURL(winURL)
-
-  // if (process.env.NODE_ENV === 'development') {
-  //   mainWindow.webContents.on('did-frame-finish-load', () => {
-  //     mainWindow.webContents.once('devtools-opened', () => {
-  //       mainWindow.focus()
-  //     })
-  //     mainWindow.webContents.openDevTools()
-  //   })
-  // }
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -63,7 +40,6 @@ function createWindow() {
         'openDirectory',
       ],
     }, (res = []) => {
-      // callback(res[0]);
       resolve(res[0]);
     });
   })
@@ -74,10 +50,7 @@ function createWindow() {
   });
 
   ipcMain.on('start', function (e, data) {
-    console.log('----4444---', data)
-    // const { minX, minY, maxX, maxY, delta } = data;
-    handler(data).then((d) => {
-      console.log(d)
+    handler(data, mainWindow).then((d) => {
       const buffer = xlsx.build([{ name: "mySheetName", data: d }])
       const split = data.url.split('/');
       fs.writeFile(data.path + `/${split[split.length - 1]}_${Date.now()}.xlsx`, buffer, (res) => {

@@ -2,6 +2,9 @@ const superagent = require('superagent')
 var fs = require("fs");
 const xlsx = require('node-xlsx');
 const list = []
+let mainWindow = null;
+let total = 0;
+let running = 0;
 const request = (reg, url = "https://globalwindatlas.info/api/gwa/custom/windSpeedRose") => {
     console.log('request')
     return superagent
@@ -48,11 +51,18 @@ const request = (reg, url = "https://globalwindatlas.info/api/gwa/custom/windSpe
 let data = []
 let count = 0;
 const fetch = (reg, delta, url) => {
+    running++;
     const curCount = count++;
     console.log('fetch: ' + curCount)
     return request(reg, url).then((res) => {
         console.log(res.text)
         console.log('fetched: ' + curCount)
+        running--;
+        mainWindow.webContents.send('running', {
+            total,
+            running,
+            finished: list.length
+        })
         // const data = [[]];
         // data[0].push(JSON.stringify(reg))
         // data[1].push(JSON.stringify(res.text))
@@ -76,10 +86,12 @@ const fetch = (reg, delta, url) => {
 }
 
 
-const handler = ({ minX, minY, maxX, maxY, delta, url, parallel = 50 }) => {
+const handler = ({ minX, minY, maxX, maxY, delta, url, parallel = 50 }, m) => {
+    mainWindow = m;
     console.log(minX, minY, maxX, maxY, delta)
     for (let i = minX; i < maxX;) {
         for (let j = minY; j < maxY;) {
+            total++
             let reg = [[i, j], [i + delta, j], [i + delta, j + delta], [i, j + delta], [i, j]]
             list.push(reg)
             j += delta

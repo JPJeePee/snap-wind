@@ -24,6 +24,11 @@
       <el-input class="input" v-model="parallel" placeholder="请输入并发数"></el-input>
     </div>
     <el-button class="btn" type="primary" @click="this.handleClick" :loading="loading">start</el-button>
+    <div class="values">
+      <div class="value">全部：{{total}}</div>
+      <div class="value">正在请求：{{running}}</div>
+      <div class="value">等待请求：{{finished}}</div>
+    </div>
   </div>
 </template>
 
@@ -35,17 +40,26 @@ export default {
   data() {
     return {
       loading: false,
+      path: "",
       url: "https://globalwindatlas.info/api/gwa/custom/windSpeedRose",
       minX: "30",
       minY: "40",
       maxX: "31",
       maxY: "41",
       delta: "0.1",
-      path: "",
-      parallel: "50"
+      parallel: "50",
+      total: 0,
+      running: 0,
+      finished: 0
     };
   },
   mounted() {
+    ipcRenderer.on("running", (e, values) => {
+      console.log(values)
+      this.total = values.total;
+      this.running = values.running;
+      this.finished = values.finished
+    });
     ipcRenderer.on("success", () => {
       alert("success");
     });
@@ -53,18 +67,9 @@ export default {
   methods: {
     onChoosePath() {
       this.$nextTick(() => {
-        // Code that will run only after the
-        // entire view has been rendered
-
         const path = ipcRenderer.sendSync("open-folder");
         console.log(path);
         this.path = path;
-        //   if (path) {
-        //     ipcRenderer.send("upload-file-message", {
-        //       filePath: this.filePath,
-        //       savePath: `${path}/output.mp4`
-        //     });
-        //   }
       });
     },
     handleClick() {
@@ -119,13 +124,23 @@ export default {
   width: 100%;
   height: auto;
 }
-
 .path {
   margin: 30px auto 0 auto !important;
 }
 .hint {
   width: 120px;
   line-height: 40px;
+}
+.values {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  bottom: 30px;
+  width: 450px;
+}
+.value {
+  flex: 1;
+  text-align: center;
 }
 .el-input {
   flex: 1;
